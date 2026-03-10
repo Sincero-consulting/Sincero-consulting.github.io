@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional Excel Cheat Sheet - Quick reference for formulas and shortcuts.">
+    <title>Sincero Consulting - Excel Cheat Sheet</title>
+    <!-- Brand Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="logo.png" alt="Sincero Consulting Logo" id="company-logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x50.png?text=SINCERO+CONSULTING';">
+            </div>
+            
+            <div class="header-titles">
+                <h1 id="page-title">Excel Cheat Sheet</h1>
+                <p id="page-subtitle" class="subtitle">Master shortcuts, formulas, and data analysis</p>
+            </div>
+
+            <div class="header-controls">
+                <button id="lang-toggle" class="control-btn" title="Cambiar a Español">
+                    <span class="lang-text">ES</span>
+                </button>
+                <button id="theme-toggle" class="control-btn" title="Toggle Dark Mode">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Search Bar injected in body -->
+        <div class="body-search-container">
+            <div class="search-wrapper body-search-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" placeholder="Search...">
+            </div>
+            
+            <div class="results-stats" id="results-stats">
+                <!-- E.g "Showing 20 results" -->
+            </div>
+        </div>
+
+        <!-- Filters injected by JS -->
+        <div class="filters-container" id="filters-container">
+            <!-- Buttons go here dynamically based on language -->
+        </div>
+
+        <!-- Content Sections -->
+        <div id="shortcuts-wrapper" class="content-section">
+            <h2 class="section-title" id="shortcuts-title">Keyboard Shortcuts</h2>
+            <div class="accordion-container" id="shortcuts-container">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <div id="formulas-wrapper" class="content-section">
+            <h2 class="section-title" id="formulas-title">Essential Formulas</h2>
+            <div class="accordion-container" id="formulas-container">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; <span id="year"></span> Sincero Consulting. <span id="footer-text">All rights reserved.</span></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
