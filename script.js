@@ -126,7 +126,8 @@ const locales = {
 };
 
 // Global State
-let currentLang = 'en'; // Default language ('en' or 'es')
+let currentLang = 'en'; // Default UI language ('en' or 'es')
+let currentExcelLang = 'en'; // Default Excel syntax language ('en' or 'es')
 let currentFilter = 'all'; // Default category layout
 let searchQuery = '';
 
@@ -135,6 +136,8 @@ const _title = document.getElementById('page-title');
 const _subtitle = document.getElementById('page-subtitle');
 const _searchInput = document.getElementById('search-input');
 const _langToggle = document.getElementById('lang-toggle');
+const _excelLangToggle = document.getElementById('excel-lang-toggle');
+const _excelLangText = document.getElementById('excel-lang-text');
 const _themeToggle = document.getElementById('theme-toggle');
 const _themeIcon = document.getElementById('theme-icon');
 const _filtersContainer = document.getElementById('filters-container');
@@ -146,6 +149,9 @@ const _shortcutsTitle = document.getElementById('shortcuts-title');
 const _formulasTitle = document.getElementById('formulas-title');
 const _resultsStats = document.getElementById('results-stats');
 const _footerText = document.getElementById('footer-text');
+const _fabFilterMenu = document.getElementById('fab-filter-menu');
+const _fabFilter = document.getElementById('fab-filter');
+const _fabTop = document.getElementById('fab-top');
 
 // Initialize application
 function init() {
@@ -165,6 +171,12 @@ function init() {
         setLanguage(currentLang === 'en' ? 'es' : 'en');
     });
 
+    _excelLangToggle.addEventListener('click', () => {
+        currentExcelLang = currentExcelLang === 'en' ? 'es' : 'en';
+        updateExcelLangButton();
+        renderItems();
+    });
+
     _themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -178,6 +190,36 @@ function init() {
         renderItems();
     });
 
+    // FAB Listeners
+    _fabTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    _fabFilter.addEventListener('click', (e) => {
+        e.stopPropagation();
+        _fabFilterMenu.classList.toggle('active');
+    });
+
+    // Close menu if clicked outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.fab-container')) {
+            _fabFilterMenu.classList.remove('active');
+        }
+    });
+
+    // Scroll listener for FAB visibility
+    window.addEventListener('scroll', () => {
+        const yPos = window.scrollY;
+        // Lowered threshold to 150 so it shows up sooner
+        if (yPos > 150) {
+            _fabTop.classList.add('visible');
+            _fabFilter.classList.add('visible');
+        } else {
+            _fabTop.classList.remove('visible');
+            _fabFilter.classList.remove('visible');
+        }
+    });
+
     // Set Copyright Year
     document.getElementById('year').textContent = new Date().getFullYear();
 }
@@ -188,6 +230,8 @@ function updateThemeIcon(theme) {
 
 function setLanguage(langCode) {
     currentLang = langCode;
+    // Default Excel syntax behavior: if UI is EN, Excel is EN. If UI is ES, we set Excel to ES initially, but allow toggle.
+    currentExcelLang = langCode === 'en' ? 'en' : 'es'; 
     localStorage.setItem('lang', langCode);
     
     const textData = locales[langCode];
@@ -203,6 +247,8 @@ function setLanguage(langCode) {
     // Update Button Text to show OPPOSITE language 
     _langToggle.querySelector('.lang-text').textContent = langCode === 'en' ? 'ES' : 'EN';
     
+    updateExcelLangButton();
+
     // Maintain filter state if possible, otherwise reset to 'all'
     if (!textData.filters[currentFilter]) {
         currentFilter = 'all';
@@ -212,26 +258,49 @@ function setLanguage(langCode) {
     renderItems();
 }
 
+function updateExcelLangButton() {
+    if (currentLang === 'es') {
+        _excelLangToggle.style.display = 'flex';
+        _excelLangText.textContent = currentExcelLang === 'es' ? 'Versión INGLÉS' : 'Versión ESPAÑOL';
+    } else {
+        _excelLangToggle.style.display = 'none';
+        currentExcelLang = 'en'; // Force English syntax if UI is English
+    }
+}
+
 function renderFilters() {
     _filtersContainer.innerHTML = '';
+    _fabFilterMenu.innerHTML = '';
     const filters = locales[currentLang].filters;
     
     for (const [key, name] of Object.entries(filters)) {
-        const btn = document.createElement('button');
-        btn.className = `filter-btn ${key === currentFilter ? 'active' : ''}`;
-        btn.textContent = name;
-        btn.dataset.filter = key;
+        // Build for main filter bar
+        const btnMain = document.createElement('button');
+        btnMain.className = `filter-btn ${key === currentFilter ? 'active' : ''}`;
+        btnMain.textContent = name;
+        btnMain.dataset.filter = key;
         
-        btn.addEventListener('click', () => {
+        // Build for FAB floating menu
+        const btnFab = document.createElement('button');
+        btnFab.className = `filter-btn ${key === currentFilter ? 'active' : ''}`;
+        btnFab.textContent = name;
+        btnFab.dataset.filter = key;
+
+        const clickHandler = () => {
             currentFilter = key;
-            // Update active styling
+            // Update active styling across both containers
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            // Re-render
+            document.querySelectorAll(`[data-filter="${key}"]`).forEach(b => b.classList.add('active'));
+            
+            _fabFilterMenu.classList.remove('active'); // Close menu after selection
             renderItems();
-        });
+        };
+
+        btnMain.addEventListener('click', clickHandler);
+        btnFab.addEventListener('click', clickHandler);
         
-        _filtersContainer.appendChild(btn);
+        _filtersContainer.appendChild(btnMain);
+        _fabFilterMenu.appendChild(btnFab);
     }
 }
 
@@ -257,7 +326,17 @@ function renderItems() {
         
         if (matchesSearch && matchesCategory) {
             totalCount++;
-            const template = createAccordionTemplate(item);
+            
+            // Sub-language toggle logic: If UI is ES but Excel Version is EN
+            let renderItemInfo = item;
+            if (currentLang === 'es' && currentExcelLang === 'en') {
+                const enItem = locales['en'].items.find(i => i.id === item.id);
+                if (enItem) {
+                    renderItemInfo = { ...item, name: enItem.name, syntax: enItem.syntax };
+                }
+            }
+
+            const template = createAccordionTemplate(renderItemInfo);
             
             if (item.type === 'shortcut') {
                 _shortcutsContainer.innerHTML += template;
