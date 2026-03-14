@@ -16,7 +16,7 @@
     <header class="header">
         <div class="header-container">
             <div class="logo-container">
-                <img src="logo1.png" alt="Sincero Consulting Logo" id="company-logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x50.png?text=SINCERO+CONSULTING';">
+                <img src="logo.png" alt="Sincero Consulting Logo" id="company-logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x50.png?text=SINCERO+CONSULTING';">
             </div>
             
             <div class="header-titles">
@@ -28,9 +28,14 @@
                 <button id="excel-lang-toggle" class="control-btn text-btn" style="display: none;" title="Cambiar versión de fórmulas de Excel">
                     <span class="lang-text" id="excel-lang-text">Versión INGLÉS</span>
                 </button>
-                <button id="lang-toggle" class="control-btn" title="Cambiar a Español">
-                    <span class="lang-text">ES</span>
-                </button>
+                <div class="lang-selector">
+                    <select id="lang-select" class="control-btn lang-select" title="Change Language">
+                        <option value="en">EN</option>
+                        <option value="es">ES</option>
+                        <option value="pt">PT</option>
+                        <option value="id">ID</option>
+                    </select>
+                </div>
                 <button id="theme-toggle" class="control-btn" title="Toggle Dark Mode">
                     <span id="theme-icon">🌙</span>
                 </button>
